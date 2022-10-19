@@ -3,10 +3,7 @@ package framework.pages;
 import framework.managers.DriverManager;
 import framework.managers.PageManager;
 import org.junit.Assert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -30,7 +27,6 @@ public class BasePage {
         js.executeScript("arguments[0].scrollIntoView({block: 'center'});", element);
     }
 
-
     protected WebElement waitUtilElementToBeClickable(WebElement element) {
         return wait.until(ExpectedConditions.elementToBeClickable(element));
     }
@@ -39,11 +35,47 @@ public class BasePage {
         return wait.until(ExpectedConditions.visibilityOf(element));
     }
 
-    protected void waitUtilElementToBeInvisible(WebElement element) {
-        wait.until(ExpectedConditions.invisibilityOf(element));
+    protected boolean waitForChangeStatus(WebElement element, boolean expectedStatus){
+       return wait.until(ExpectedConditions.attributeContains(element, "ariaChecked", String.valueOf(expectedStatus)));
     }
 
-    protected boolean checkNoneTitle(WebElement element) {
+    protected WebElement waitForChangeValue(WebElement element, String value){
+        double startTime = System.currentTimeMillis();
+        while (System.currentTimeMillis() < startTime + 5000){
+            String val = convertValueToNumb(element);
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ignore) { }
+            if(val.equals(value)){
+                return element;
+            }
+        }
+        Assert.fail("Значение " + element + " не соответствует ожидаемому");
+        return element;
+    }
+
+    protected void waitForJavascript() {
+        double startTime = System.currentTimeMillis();
+        while (System.currentTimeMillis() < startTime + 5000) {
+            String prevState = driverManager.getDriver().getPageSource();
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException ignore) { }
+            if (prevState.equals(driverManager.getDriver().getPageSource())) {
+                return;
+            }
+        }
+    }
+
+    protected String convertTextToNumb(WebElement element) {
+        return element.getText().replaceAll("\\D", "");
+    }
+
+    protected String convertValueToNumb(WebElement element) {
+        return element.getAttribute("value").replaceAll("\\D", "");
+    }
+
+    protected boolean checkNoneElement(WebElement element) {
         try {
             return element.isEnabled();
         } catch (NoSuchElementException e) {
@@ -51,11 +83,32 @@ public class BasePage {
         }
     }
 
-    protected void clickAndCheckLink(WebElement element){
-        String subMenuLink = element.getAttribute("href");
-        waitUtilElementToBeClickable(element).click();
-        Assert.assertEquals("Переход на другую страницу не осуществлен",
-                subMenuLink, driverManager.getDriver().getCurrentUrl());
+    protected void iFrameOn(WebElement iframe){
+        wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(iframe));
+    }
+
+    protected void iFrameOff(){
+        driverManager.getDriver().switchTo().defaultContent();
+    }
+
+    protected void fillField(WebElement element, String value) {
+        scrollElementInCenter(element);
+        js.executeScript("arguments[0].click();", element);
+        element.sendKeys(Keys.CONTROL + "a");
+        sendKeyArray(element, value);
+        element.sendKeys(Keys.ENTER);
+    }
+
+    protected void sendKeyArray(WebElement element, String value) {
+        String[] strValue = value.split("");
+        for (String s: strValue) {
+            element.sendKeys(s);
+        }
+    }
+
+    protected void scrollAndClick(WebElement element) {
+        scrollElementInCenter(element);
+        js.executeScript("arguments[0].click();", element);
     }
 
     protected void clickAndCheckTitle(WebElement element){
