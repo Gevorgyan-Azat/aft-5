@@ -27,7 +27,5 @@ public class SberTest extends BaseTests {
                 .checkResultValue(MONTHLY_PAYMENT, "20852")
                 .checkResultValue(REQUIRED_INCOME, "35448")
                 .checkResultValue(PERCENT_RATE, "11%");
-
-
     }
 }

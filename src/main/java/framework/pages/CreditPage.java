@@ -19,10 +19,12 @@ public class CreditPage extends BasePage {
         iFrameOn(calculatorIframe);
         waitForJavascript();
         WebElement field = driverManager.getDriver().findElement(By.xpath(fieldName.getValue()));
-        fillField(field, fieldValue);
-        waitUtilElementToBeVisible(waitForChangeValue(field, fieldValue));
-        Assert.assertEquals("Значение поля '" + fieldName + "' не соответствут ожидаемому значению",
-                fieldValue, convertValueToNumb(field));
+        if(!convertValueToNumb(field).equals(fieldValue)) {
+            fillField(field, fieldValue);
+            waitUtilElementToBeVisible(waitForChangeValue(field, fieldValue));
+            Assert.assertEquals("Значение поля '" + fieldName + "' не соответствут ожидаемому значению",
+                    fieldValue, convertValueToNumb(field));
+        }
         iFrameOff();
         return this;
     }
@@ -32,24 +34,14 @@ public class CreditPage extends BasePage {
         iFrameOn(calculatorIframe);
         waitForJavascript();
         WebElement checkBox = driverManager.getDriver().findElement(By.xpath(checkBoxName.getValue()));
-        if (expectedStatus) {
-            if (!Boolean.parseBoolean(checkBox.getAttribute("ariaChecked"))) {
-                scrollAndClick(checkBox);
-                waitForChangeStatus(checkBox, expectedStatus);
-                Assert.assertTrue("Состояние CheckBox: " + checkBoxName + " не изменилось",
-                        Boolean.parseBoolean(checkBox.getAttribute("ariaChecked")));
-            }
-            iFrameOff();
-            return this;
-        }
-        if (Boolean.parseBoolean(checkBox.getAttribute("ariaChecked"))) {
+        if(Boolean.parseBoolean(checkBox.getAttribute("ariaChecked")) != expectedStatus) {
             scrollAndClick(checkBox);
             waitForChangeStatus(checkBox, expectedStatus);
-            Assert.assertFalse("Состояние CheckBox: " + checkBoxName + " не изменилось",
-                    Boolean.parseBoolean(checkBox.getAttribute("ariaChecked")));
+            Assert.assertEquals("Состояние CheckBox: " + checkBoxName + " не изменилось",
+                    expectedStatus, Boolean.parseBoolean(checkBox.getAttribute("ariaChecked")));
         }
         iFrameOff();
-        return this;
+        return  this;
     }
 
     @Step("Проверка результата поля {resultName}")
@@ -58,7 +50,6 @@ public class CreditPage extends BasePage {
         waitForJavascript();
         WebElement resultValue = driverManager.getDriver().findElement(By.xpath(resultName.getValue()));
         scrollElementInCenter(resultValue);
-        String a = convertTextToNumb(resultValue);
         Assert.assertEquals("Значение '" + resultName + "' не совпадает с ожидаемым значением",
                 checkValue, convertTextToNumb(resultValue));
         iFrameOff();
@@ -120,8 +111,8 @@ public class CreditPage extends BasePage {
         }
 
         public String getValue() {
-            return "//div[@class='_1aQ5fS4QO26GDWmJlBTrB6']//span[@class='_2K-vC4nTzrGG1TQHQ2HGL' and contains(text(), '"
-                    + value + "')]/following-sibling::span/span";
+            return "//div[@data-test-id='main-results-block']//span[contains(text(), '"
+                    + value +"')]/following-sibling::span/span";
         }
     }
 }

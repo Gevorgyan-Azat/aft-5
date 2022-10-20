@@ -54,6 +54,19 @@ public class BasePage {
         return element;
     }
 
+    protected void waitForChangeURL(String value) {
+        double startTime = System.currentTimeMillis();
+        while (System.currentTimeMillis() < startTime + 5000) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException ignore) {
+            }
+            if (!driverManager.getDriver().getCurrentUrl().equals(value)) {
+                return;
+            }
+        }
+    }
+
     protected void waitForJavascript() {
         double startTime = System.currentTimeMillis();
         while (System.currentTimeMillis() < startTime + 5000) {
