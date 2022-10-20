@@ -1,6 +1,7 @@
 package framework.pages.blocks;
 
 import framework.pages.BasePage;
+import io.qameta.allure.Step;
 import org.junit.Assert;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -15,6 +16,7 @@ public class NavigationBlock extends BasePage {
     @FindBy(xpath = "//a[contains(@class, 'kitt-top-menu__link_second')]")
     private List<WebElement> subMenuList;
 
+    @Step("Выбор пункта '{baseMenuValue}'  главного меню")
     public NavigationBlock selectBaseMenu(String baseMenuValue) {
         for (WebElement baseMenu: baseMenuList) {
             if(baseMenu.getAttribute("textContent").contains(baseMenuValue)){
@@ -29,6 +31,7 @@ public class NavigationBlock extends BasePage {
         return this;
     }
 
+    @Step("Выбор пункта '{subMenuValue}'  подменю")
     public NavigationBlock selectSubMenu(String subMenuValue) {
         for (WebElement subMenu: subMenuList) {
             if(subMenu.getAttribute("text").contains(subMenuValue)){

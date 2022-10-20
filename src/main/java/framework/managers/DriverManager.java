@@ -21,7 +21,7 @@ public class DriverManager {
         private static DriverManager INSTANCE = null;
 
         private static final String mvnBrowserName = System.getProperty("browser");
-        private String selectedBrowserName = propManager.getProperty(TYPE_BROWSER);
+        private String propBrowserName = propManager.getProperty(TYPE_BROWSER);
 
         public static DriverManager getINSTANCE() {
             if (INSTANCE == null) {
@@ -61,9 +61,9 @@ public class DriverManager {
 
     private void initDriverAnyOsFamily(String gecko, String chrome) {
             if(mvnBrowserName != null){
-                selectedBrowserName = mvnBrowserName;
+                propBrowserName = mvnBrowserName;
             }
-        switch (selectedBrowserName) {
+        switch (propBrowserName) {
             case "chrome":
                 System.setProperty("webdriver.chrome.driver", propManager.getProperty(chrome));
                 driver = new ChromeDriver();
@@ -87,37 +87,9 @@ public class DriverManager {
                 }
                 break;
             default:
-                Assert.fail("Типа браузера '" + selectedBrowserName + "' не существует во фреймворке");
+                Assert.fail("Типа браузера '" + propBrowserName + "' не существует во фреймворке");
         }
     }
-
-//    private void initDriver() {
-//            switch (propManager.getProperty(TYPE_BROWSER)) {
-//                case "chrome":
-//                    System.setProperty("webdriver.chrome.driver", propManager.getProperty(PATH_CHROME_DRIVER_WINDOWS));
-//                    driver = new ChromeDriver();
-//                    break;
-//                case "firefox":
-//                    System.setProperty("webdriver.gecko.driver", propManager.getProperty(PATH_GECKO_DRIVER_WINDOWS));
-//                    driver = new FirefoxDriver();
-//                    break;
-//                case "remote":
-//                    DesiredCapabilities capabilities = new DesiredCapabilities();
-//                    capabilities.setBrowserName("chrome");
-//                    capabilities.setVersion("84.0");
-//                    capabilities.setCapability("enableVNC", true);
-//                    capabilities.setCapability("enableVideo", false);
-//                    try {
-//                        driver = new RemoteWebDriver(
-//                                URI.create("http://130.193.49.85:4444/wd/hub").toURL(),
-//                                capabilities);
-//                    }catch (MalformedURLException e) {
-//                        e.printStackTrace();
-//                    }
-//                    break;
-//                default: break;
-//            }
-//        }
 
         public void quitDriver() {
             if (driver != null) {
@@ -125,5 +97,4 @@ public class DriverManager {
                 driver = null;
             }
         }
-
     }

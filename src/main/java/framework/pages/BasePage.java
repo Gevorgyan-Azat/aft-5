@@ -68,7 +68,7 @@ public class BasePage {
     }
 
     protected String convertTextToNumb(WebElement element) {
-        return element.getText().replaceAll("\\D", "");
+        return element.getText().replaceAll("[^\\d%,]", "");
     }
 
     protected String convertValueToNumb(WebElement element) {

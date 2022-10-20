@@ -1,14 +1,17 @@
 package framework.managers;
 
-import framework.pages.CreditPage;
-import framework.pages.StartPage;
+import framework.pages.BasePage;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class PageManager {
 
     private static PageManager INSTANCE = null;
+    private Map<String, BasePage> mapPages = new HashMap<>();
 
-    private StartPage startPage;
-    private CreditPage creditPage;
+    private PageManager() {
+    }
 
     public static PageManager getINSTANCE() {
         if (INSTANCE == null) {
@@ -17,17 +20,14 @@ public class PageManager {
         return INSTANCE;
     }
 
-    public StartPage getStartPage() {
-        if (startPage == null) {
-            startPage = new StartPage();
+    public <T extends BasePage> T getPage(Class<T> ex) {
+        if (mapPages.isEmpty() || mapPages.get(ex.getName()) == null) {
+            try {
+                mapPages.put(ex.getName(), ex.newInstance());
+            } catch (IllegalAccessException | InstantiationException e) {
+                e.printStackTrace();
+            }
         }
-        return startPage;
-    }
-
-    public CreditPage getCreditPage() {
-        if (creditPage == null) {
-            creditPage = new CreditPage();
-        }
-        return creditPage;
+        return (T) mapPages.get(ex.getName());
     }
 }
